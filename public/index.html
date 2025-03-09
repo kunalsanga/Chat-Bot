@@ -112,17 +112,20 @@
     <script>
         let debounceTimeout;
 
-        document.getElementById('send-btn').addEventListener('click', () => {
+        // Function to handle message sending
+        function handleSend() {
             clearTimeout(debounceTimeout);
-            debounceTimeout = setTimeout(sendMessage, 300);
-        });
+            debounceTimeout = setTimeout(sendMessage, 100);
+        }
+
+        // Add event listener for Send button
+        document.getElementById('send-btn').addEventListener('click', handleSend);
 
         // Add event listener for Enter key
-        document.getElementById('user-input').addEventListener('keypress', (event) => {
-            if (event.key === 'Enter') {
-                event.preventDefault(); // Prevent default form submission
-                clearTimeout(debounceTimeout);
-                debounceTimeout = setTimeout(sendMessage, 300);
+        document.getElementById('user-input').addEventListener('keydown', (event) => {
+            if (event.key === 'Enter' && !event.shiftKey) {
+                event.preventDefault();
+                handleSend();
             }
         });
 
