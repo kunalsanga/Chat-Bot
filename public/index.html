@@ -117,6 +117,15 @@
             debounceTimeout = setTimeout(sendMessage, 300);
         });
 
+        // Add event listener for Enter key
+        document.getElementById('user-input').addEventListener('keypress', (event) => {
+            if (event.key === 'Enter') {
+                event.preventDefault(); // Prevent default form submission
+                clearTimeout(debounceTimeout);
+                debounceTimeout = setTimeout(sendMessage, 300);
+            }
+        });
+
         async function sendMessage() {
             const userInput = document.getElementById('user-input').value;
             const chatBox = document.getElementById('chat-box');
