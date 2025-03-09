@@ -5,10 +5,103 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Chatbot</title>
     <link rel="stylesheet" href="styles.css">
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: #e9ecef;
+            font-size: 1.2em;
+        }
+        .chat-container {
+            width: 100%;
+            height: 100%;
+            max-width: 100%;
+            max-height: 100%;
+            background-color: #fff;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        .chat-header {
+            background-color: #007bff;
+            color: white;
+            padding: 15px;
+            text-align: center;
+            font-size: 1.5em;
+        }
+        .chat-box {
+            flex: 1;
+            padding: 15px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        .message {
+            margin: 10px 0;
+            padding: 15px;
+            border-radius: 25px;
+            max-width: 80%;
+            opacity: 0;
+            transform: translateY(20px);
+            animation: fadeInUp 0.5s forwards;
+            font-size: 1.1em;
+            line-height: 1.6;
+        }
+        .user-message {
+            background-color: #dcf8c6;
+            align-self: flex-end;
+            color: #333;
+        }
+        .bot-message {
+            background-color: #ececec;
+            align-self: flex-start;
+            color: #333;
+        }
+        .input-container {
+            display: flex;
+            border-top: 1px solid #ddd;
+        }
+        .input-container input {
+            flex: 1;
+            padding: 15px;
+            border: none;
+            outline: none;
+            font-size: 1.1em;
+        }
+        .input-container button {
+            padding: 15px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            font-size: 1.1em;
+        }
+        .input-container button:hover {
+            background-color: #0056b3;
+        }
+        @keyframes fadeInUp {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        .typing-indicator {
+            font-style: italic;
+            color: #888;
+            margin: 10px 0;
+        }
+    </style>
 </head>
 <body>
     <div class="chat-container">
-        <h1>Chatbot</h1>
+        <div class="chat-header">Chatbot</div>
         <div id="chat-box" class="chat-box"></div>
         <div class="input-container">
             <input type="text" id="user-input" placeholder="Type your message here...">
@@ -31,7 +124,15 @@
             if (userInput.trim() === '') return;
 
             // Display user message
-            chatBox.innerHTML += `<div class="message user-message">${userInput}</div>`;
+            appendMessage(userInput, 'user-message');
+
+            // Show typing indicator
+            const typingIndicator = document.createElement('div');
+            typingIndicator.id = 'typing-indicator';
+            typingIndicator.className = 'message typing-indicator';
+            typingIndicator.textContent = 'Chatbot is typing...';
+            chatBox.appendChild(typingIndicator);
+            chatBox.scrollTop = chatBox.scrollHeight;
 
             // Send request to server
             const response = await fetch('/chat', {
@@ -43,16 +144,29 @@
             });
 
             const data = await response.json();
+
+            // Remove typing indicator
+            chatBox.removeChild(typingIndicator);
+
             if (data.response) {
                 // Display bot response
-                chatBox.innerHTML += `<div class="message bot-message">${data.response}</div>`;
+                appendMessage(data.response, 'bot-message');
             } else {
-                chatBox.innerHTML += `<div class="message bot-message">Error: Could not get response</div>`;
+                appendMessage('Error: Could not get response', 'bot-message');
             }
 
             // Clear input
             document.getElementById('user-input').value = '';
             chatBox.scrollTop = chatBox.scrollHeight; // Auto-scroll to the bottom
+        }
+
+        function appendMessage(text, className) {
+            const chatBox = document.getElementById('chat-box');
+            const message = document.createElement('div');
+            message.className = `message ${className}`;
+            message.textContent = text;
+            chatBox.appendChild(message);
+            chatBox.scrollTop = chatBox.scrollHeight;
         }
     </script>
 </body>
